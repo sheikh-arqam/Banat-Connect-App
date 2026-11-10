@@ -1,6 +1,12 @@
 /* Banat Connect — brown Meezan theme (approved).
    Brown + soft cream only. NO yellow, NO gold, NO green.
-   Simple flat buttons, no 3D, no glossy effects. */
+   Simple flat buttons, no 3D, no glossy effects.
+   LIGHT THEME ALWAYS: the app must never switch to a dark theme,
+   even when the phone or browser is in dark mode. The meta
+   color-scheme in index.html plus color-scheme: light here stop
+   browsers from auto-darkening the page (Android Chrome dark mode). */
+:root { color-scheme: light; }
+html { color-scheme: light; background: #faf3e7; }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #faf3e7; color: #3e2723; }
 button, input, textarea { font: inherit; }

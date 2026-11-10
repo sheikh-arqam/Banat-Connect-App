@@ -81,9 +81,22 @@ function ChatPanel({ messages, user, onSend, onViewed, showReadReceipts, showFir
     e.target.value = ''
   }
 
-  const openVoiceFallback = () => {
-    setVoiceNote("Mic permission wasn't given here — choose a recording and it will be sent as a voice note instead.")
+  const pickVoiceFile = () => {
     voiceInputRef.current?.click()
+  }
+
+  // Fallback: sending a voice note must always stay possible.
+  // It only appears when real recording actually failed — never as the
+  // first response to tapping the mic. If the browser blocked the mic,
+  // explain how to allow it and let the user choose a recording with a
+  // tap, instead of opening the picker by itself.
+  const openVoiceFallback = (reason: 'denied' | 'unavailable') => {
+    if (reason === 'denied') {
+      setVoiceNote("Microphone is blocked for this site — please allow microphone access in your browser settings, then tap the mic again to record. Or choose a recording below and it will be sent as a voice note.")
+    } else {
+      setVoiceNote("Recording isn't available here — choose a recording and it will be sent as a voice note instead.")
+      pickVoiceFile()
+    }
   }
 
   const stopRecording = () => {
@@ -97,16 +110,20 @@ function ChatPanel({ messages, user, onSend, onViewed, showReadReceipts, showFir
     if (recording) { stopRecording(); return }
     try {
       if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-        openVoiceFallback()
+        openVoiceFallback('unavailable')
         return
       }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const rec = new MediaRecorder(stream)
+      // Pick a recording format this browser supports (Safari needs mp4).
+      const mimeType = ['audio/webm', 'audio/mp4', 'audio/webm;codecs=opus'].find((t) => {
+        try { return MediaRecorder.isTypeSupported(t) } catch { return false }
+      })
+      const rec = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
       chunksRef.current = []
       rec.ondataavailable = (ev) => { if (ev.data.size > 0) chunksRef.current.push(ev.data) }
       rec.onstop = () => {
         stream.getTracks().forEach((t) => t.stop())
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        const blob = new Blob(chunksRef.current, { type: rec.mimeType || 'audio/webm' })
         const reader = new FileReader()
         reader.onload = () => onSend({ sender: user.name, senderRole: user.role, kind: 'voice', text: 'Voice note', dataUrl: String(reader.result) })
         reader.readAsDataURL(blob)
@@ -116,8 +133,11 @@ function ChatPanel({ messages, user, onSend, onViewed, showReadReceipts, showFir
       setRecording(true)
       setRecSeconds(0)
       timerRef.current = setInterval(() => setRecSeconds((s) => s + 1), 1000)
-    } catch {
-      openVoiceFallback()
+    } catch (err) {
+      // Permission denied/blocked: explain, don't auto-open the picker.
+      // Any other failure (no mic, in use, etc.): fall back to picking a file.
+      const name = err instanceof DOMException ? err.name : ''
+      openVoiceFallback(name === 'NotAllowedError' || name === 'SecurityError' ? 'denied' : 'unavailable')
     }
   }
 
@@ -147,7 +167,14 @@ function ChatPanel({ messages, user, onSend, onViewed, showReadReceipts, showFir
           ● Recording… {Math.floor(recSeconds / 60)}:{String(recSeconds % 60).padStart(2, '0')} — tap the mic again to stop and send.
         </div>
       )}
-      {voiceNote && <div className="voice-note">{voiceNote}</div>}
+      {voiceNote && (
+        <div className="voice-note">
+          {voiceNote}
+          <div style={{ marginTop: 8 }}>
+            <button className="btn small" onClick={pickVoiceFile}>Choose a recording instead</button>
+          </div>
+        </div>
+      )}
       <div className="chat-inputbar">
         <button className="iconbtn" onClick={() => setShowEmoji(!showEmoji)} title="Emoji">😊</button>
         <label className="iconbtn" title="Attach a photo or file">📎<input type="file" hidden onChange={(e) => handleFile(e, 'file')} /></label>

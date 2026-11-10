@@ -4,8 +4,11 @@ Free, female-only learning portal for Islamic institutes: live classes,
 after-class chat, announcements, digital library, attendance and
 assignments. No phone numbers anywhere — login is by name + email only.
 
-Live site: https://banat-app.vercel.app (Vercel project `banat-app`,
-auto-deploys from this repo's `main` branch).
+Live site: https://banat-app.vercel.app — NOTE: the Vercel project
+`banat-app` is still connected to the OLD repo (`Banat-App`). It does NOT
+auto-deploy from this repo yet. To serve this new app, import this repo
+(`sheikh-arqam/Banat-Connect-App`) as a Vercel project (same Import flow
+as before) — then Vercel auto-deploys from this repo's `main` branch.
 
 ## What is in this version
 

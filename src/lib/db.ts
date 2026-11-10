@@ -18,9 +18,9 @@
 // 1. Create a free project at https://supabase.com (or reuse an existing
 //    Banat project — do NOT reuse the Huffaz project).
 // 2. In Supabase: SQL Editor -> run supabase/schema.sql from this repo.
-// 3. In Vercel (project banat-app): Settings -> Environment Variables ->
-//    add VITE_SUPABASE_URL (Project URL) and VITE_SUPABASE_ANON_KEY
-//    (anon public key) -> Redeploy.
+// 3. In Vercel (the project created from this repo): Settings ->
+//    Environment Variables -> add VITE_SUPABASE_URL (Project URL) and
+//    VITE_SUPABASE_ANON_KEY (anon public key) -> Redeploy.
 // 4. Never paste the service_role key anywhere — the anon key is enough.
 //
 // No keys are hard-coded here. No tokens from chat history are used.

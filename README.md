@@ -45,9 +45,9 @@ To turn sync on:
 1. Create a free project at https://supabase.com (a Banat project — do
    NOT reuse the Huffaz project).
 2. Supabase SQL Editor → run `supabase/schema.sql` from this repo.
-3. Vercel → project `banat-app` → Settings → Environment Variables →
-   add `VITE_SUPABASE_URL` (Project URL) and `VITE_SUPABASE_ANON_KEY`
-   (anon public key) → Redeploy.
+3. Vercel → the project created from this repo → Settings →
+   Environment Variables → add `VITE_SUPABASE_URL` (Project URL) and
+   `VITE_SUPABASE_ANON_KEY` (anon public key) → Redeploy.
 4. Never use the `service_role` key in the app or Vercel.
 
 ## Local dev
